@@ -41,7 +41,7 @@ panzoom(element)
 <body>
   <svg>
     <!-- this is the draggable root -->
-    <g id='scene'> 
+    <g id='scene'>
       <circle cx='10' cy='10' r='5' fill='pink'></circle>
     </g>
   </svg>
@@ -50,7 +50,7 @@ panzoom(element)
 
 ``` js
 // In the browser panzoom is already on the
-// window. If you are in common.js world, then 
+// window. If you are in common.js world, then
 // var panzoom = require('panzoom')
 
 // grab the DOM SVG element that you want to be draggable/zoomable:
@@ -60,7 +60,7 @@ var element = document.getElementById('scene')
 panzoom(element)
 ```
 
-If require a dynamic behavior (e.g. you want to make an `element` not 
+If require a dynamic behavior (e.g. you want to make an `element` not
 draggable anymore, or even completely delete an SVG element) make sure to call
 `dispose()` method:
 
@@ -302,7 +302,7 @@ If you want to quickly play with panzoom without using javascript, you can confi
 <body>
   <svg>
     <!-- this is the draggable root -->
-    <g id='scene'> 
+    <g id='scene'>
       <circle cx='10' cy='10' r='5' fill='pink'></circle>
     </g>
   </svg>
@@ -310,7 +310,7 @@ If you want to quickly play with panzoom without using javascript, you can confi
 </html>
 ```
 
-Most importantly, you can see `query` attribute that points to CSS selector. Once the element is found 
+Most importantly, you can see `query` attribute that points to CSS selector. Once the element is found
 panzoom is attached to this element. The controller will become available under `window.pz` name. And you
 can pass additional options to the panzoom via attributes prefixed with `pz-`.
 
@@ -320,11 +320,11 @@ Here is a demo: [Script based attributes](https://anvaka.github.io/panzoom/demo/
 
 You can adjust the double click zoom multiplier, by passing optional `zoomDoubleClickSpeed` argument.
 
-When double clicking, zoom is multiplied by `zoomDoubleClickSpeed`, which means that a value of 1 will disable double click zoom completely. 
+When double clicking, zoom is multiplied by `zoomDoubleClickSpeed`, which means that a value of 1 will disable double click zoom completely.
 
 ``` js
 panzoom(element, {
-  zoomDoubleClickSpeed: 1, 
+  zoomDoubleClickSpeed: 1,
 });
 ```
 
@@ -360,7 +360,7 @@ panzoom(element, {
 ```
 
 Note: if you don't `preventDefault` yourself - make sure you test the page behavior on iOS devices.
-Sometimes this may cause page to [bounce undesirably](https://stackoverflow.com/questions/23862204/disable-ios-safari-elastic-scrolling). 
+Sometimes this may cause page to [bounce undesirably](https://stackoverflow.com/questions/23862204/disable-ios-safari-elastic-scrolling).
 
 
 ## Handling double click events
@@ -382,9 +382,9 @@ panzoom(element, {
 
 ## Bounds on Panzoom
 
-By default panzoom will not prevent Image from Panning out of the Container. `bounds` (boolean) and 
+By default panzoom will not prevent Image from Panning out of the Container. `bounds` (boolean) and
 `boundsPadding` (number)  can be defined so that it doesn't fall out. Default value for `boundsPadding` is `0.05` .
- 
+
 
 ``` js
 panzoom(element, {
@@ -393,7 +393,7 @@ panzoom(element, {
 });
 ```
 
-## Triggering Pan 
+## Triggering Pan
 
 To Pan the object using Javascript use `moveTo(<number>,<number>)` function. It expects x, y value to where to move.
 
@@ -404,22 +404,7 @@ instance.moveTo(0, 0);
 To pan in a smooth way use `smoothMoveTo(<number>,<number>)`:
 
 ``` js
-instance.smoothMoveTo(0, 0);
-```
-
-
-## Triggering Zoom
-
-To Zoom the object using Javascript use `zoomTo(<number>,<number>,<number>)` function. It expects x, y value as coordinates of where to zoom. It also expects the zoom factor as the third argument. If zoom factor is greater than 1, apply zoom IN. If zoom factor is less than 1, apply zoom OUT.
-
-``` js
-instance.zoomTo(0, 0, 2);
-```
-
-To zoom in a smooth way use `smoothZoom(<number>,<number>,<number>)`:
-
-``` js
-instance.smoothZoom(0, 0, 0.5);
+panzoom.smoothMoveTo(0, 0);
 ```
 
 ## Custom UI to trigger zoom
@@ -430,6 +415,51 @@ following this example:
 
 * [Live demo](https://anvaka.github.io/panzoom/demo/buttons.html)
 * [Source code of the demo](https://github.com/anvaka/panzoom/blob/3731bff2e15f2b4299405c2a59a24f30c3549a17/demo/buttons.html#L851)
+
+To pan and zoom to a specific in dom/svg coordinate use:
+
+``` js
+rect =  {
+  top: 10,
+  left: 20,
+  bottom: 30,
+  right: 40,
+};
+
+panzoom.showRectangle(rect);
+```
+
+to do this in a smooth fashion do
+
+``` js
+panzoom.smoothShowRectangle(rect);
+```
+you can also give a function that gets the current rect and the target rect to determine the duration of the animation, like:
+
+``` js
+panzoom.smoothShowRectangle(rect, (from, to) => {
+  var distance = Math.sqrt(
+    Math.pow(from.top - to.top, 2)
+    + Math.pow(from.right - to.right, 2)
+    + Math.pow(from.bottom - to.bottom, 2)
+    + Math.pow(from.left - to.left, 2)
+  );
+
+  var exp_diff = Math.exp(distance / 1000);
+  var sigmoid = (exp_diff * 1000) / (exp_diff + 1);
+
+  return sigmoid;
+})
+```
+
+Further more: the `smoothShowRectangle` return a promise, so that the caller can act on the completion of the animation.
+
+``` js
+panzoom.smoothShowRectangle(rect)
+  .then(() => {
+    console.log("animation complete");
+  });
+```
 
 # license
 
